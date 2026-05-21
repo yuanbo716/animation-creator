@@ -59,6 +59,7 @@ def _worker_loop():
         except Exception as exc:
             job.status = "failed"
             job.error = str(exc)
+            job.elapsed_sec = time.time() - start
             import traceback
             traceback.print_exc()
         finally:
