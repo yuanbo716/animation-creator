@@ -31,12 +31,21 @@ def test_generate_animation_returns_gif_and_mp4(avatar_path, fake_frames, tmp_pa
     assert gif_path.endswith(".gif")
     assert mp4_path.endswith(".mp4")
     assert os.path.exists(gif_path)
+    assert os.path.exists(mp4_path)
 
 
 def test_generate_animation_fires_progress_callback(avatar_path, fake_frames, tmp_path):
     mock_output = MagicMock()
     mock_output.frames = [fake_frames]
-    mock_pipe = MagicMock(return_value=mock_output)
+
+    def pipe_side_effect(*args, **kwargs):
+        cb = kwargs.get("callback_on_step_end")
+        if cb is not None:
+            for step in range(40):
+                cb(None, step, None, {})
+        return mock_output
+
+    mock_pipe = MagicMock(side_effect=pipe_side_effect)
 
     calls = []
     with patch("inference._get_pipeline", return_value=mock_pipe):
@@ -47,5 +56,6 @@ def test_generate_animation_fires_progress_callback(avatar_path, fake_frames, tm
             output_dir=str(tmp_path),
         )
 
-    assert len(calls) > 0
+    assert len(calls) > 1
+    assert calls[0] == (1, 40)
     assert calls[-1] == (40, 40)
