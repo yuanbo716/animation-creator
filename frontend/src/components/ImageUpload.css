@@ -1,0 +1,33 @@
+.upload-zone {
+  border: 2px dashed #4b5563;
+  border-radius: 10px;
+  padding: 1.25rem;
+  text-align: center;
+  background: rgba(255,255,255,0.02);
+}
+.upload-zone p { margin: 0.25rem 0; font-size: 0.875rem; }
+.upload-hint { color: #6b7280; font-size: 0.75rem !important; }
+.upload-icon { font-size: 2rem; }
+.browse-btn {
+  display: inline-block;
+  margin-top: 0.75rem;
+  padding: 0.4rem 1rem;
+  border: 1px solid #4b5563;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.browse-btn:hover { background: rgba(255,255,255,0.06); }
+.upload-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(99,102,241,0.1);
+  border: 1px solid rgba(99,102,241,0.3);
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.85rem;
+}
+.preview-name { font-weight: 600; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.preview-size { color: #6b7280; font-size: 0.75rem; }
+.remove-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.78rem; padding: 0; }
