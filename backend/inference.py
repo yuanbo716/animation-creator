@@ -14,12 +14,14 @@ _pipeline = None
 _MODEL_ID = "Wan-AI/Wan2.1-T2V-1.3B-Diffusers"
 
 # 9 frames = ~1 s @ 8 fps; must satisfy k*8+1 for Wan temporal compression.
-# 480×832 still OOMs on 16 GB even at 9 frames — 320×512 cuts spatial tokens
-# by ~60% and keeps peak MPS usage well under the 18 GB watermark.
+# 480×640 is the sweet-spot for 16 GB: ~30% more pixels than 320×512 without
+# hitting the 18.13 GiB MPS watermark that 480×832 triggers.
 _NUM_FRAMES = 9
-_HEIGHT = 320
-_WIDTH = 512
+_HEIGHT = 480
+_WIDTH = 640
 _FPS = 8
+
+_NEGATIVE_PROMPT = "low quality, blurry, distorted, bad anatomy, worst quality, ugly, deformed"
 
 
 def _get_pipeline():
@@ -56,10 +58,12 @@ def generate_animation(
 
     output = pipe(
         prompt=prompt,
+        negative_prompt=_NEGATIVE_PROMPT,
         height=_HEIGHT,
         width=_WIDTH,
         num_frames=_NUM_FRAMES,
         num_inference_steps=num_inference_steps,
+        guidance_scale=7.5,
         callback_on_step_end=_step_cb,
     )
 

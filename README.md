@@ -83,12 +83,12 @@ The model (~6 GB) downloads automatically on first generation and is cached at `
 Edit `backend/inference.py` and change:
 
 ```python
-# 16 GB — default, safe
+# 16 GB — default, balanced quality
 _NUM_FRAMES = 9
-_HEIGHT = 320
-_WIDTH = 512
+_HEIGHT = 480
+_WIDTH = 640
 
-# 24 GB — higher quality
+# 24 GB — highest quality
 _NUM_FRAMES = 17
 _HEIGHT = 480
 _WIDTH = 832
