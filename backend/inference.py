@@ -9,16 +9,30 @@ from PIL import Image
 
 _pipeline = None
 
+_MODEL_ID = "Wan-AI/Wan2.1-I2V-14F-480P"
+
 
 def _get_pipeline():
     global _pipeline
     if _pipeline is not None:
         return _pipeline
     from diffusers import WanImageToVideoPipeline
-    _pipeline = WanImageToVideoPipeline.from_pretrained(
-        "Wan-AI/Wan2.1-I2V-14F-480P",
-        torch_dtype=torch.bfloat16,
-    )
+    token = os.environ.get("HF_TOKEN") or os.environ.get("HUGGINGFACE_TOKEN")
+    try:
+        _pipeline = WanImageToVideoPipeline.from_pretrained(
+            _MODEL_ID,
+            torch_dtype=torch.bfloat16,
+            token=token,
+        )
+    except Exception as e:
+        msg = str(e)
+        if "401" in msg or "RepositoryNotFound" in msg or "authentication" in msg.lower():
+            raise RuntimeError(
+                f"Cannot access {_MODEL_ID}: HuggingFace authentication required. "
+                "Run: huggingface-cli login  (or set HF_TOKEN env var). "
+                "Then accept the model license at https://huggingface.co/Wan-AI/Wan2.1-I2V-14F-480P"
+            ) from e
+        raise
     _pipeline.to("mps")
     return _pipeline
 
