@@ -63,7 +63,8 @@ def generate_animation(
         callback_on_step_end=_step_cb,
     )
 
-    frames = output.frames[0]
+    raw = output.frames[0]
+    frames = [Image.fromarray(f) if isinstance(f, np.ndarray) else f for f in raw]
     job_id = str(uuid.uuid4())
 
     duration_ms = int(1000 / _FPS)
