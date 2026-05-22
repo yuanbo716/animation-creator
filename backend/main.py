@@ -2,6 +2,7 @@ import os
 import shutil
 import uuid as _uuid
 from fastapi import FastAPI, File, Form, HTTPException, Query, UploadFile
+from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from worker import create_job, get_job
@@ -29,18 +30,19 @@ def health():
 
 @app.post("/generate")
 async def generate(
-    image: UploadFile = File(...),
     prompt: str = Form(...),
+    image: Optional[UploadFile] = File(None),
 ):
-    allowed = {"image/png", "image/jpeg", "image/webp"}
-    if image.content_type not in allowed:
-        raise HTTPException(status_code=400, detail="Image must be PNG, JPEG, or WEBP")
-
-    ext = image.filename.rsplit(".", 1)[-1] if "." in image.filename else "png"
-    temp_id = str(_uuid.uuid4())
-    image_path = os.path.join(UPLOAD_DIR, f"{temp_id}.{ext}")
-    with open(image_path, "wb") as f:
-        shutil.copyfileobj(image.file, f)
+    image_path = None
+    if image is not None:
+        allowed = {"image/png", "image/jpeg", "image/webp"}
+        if image.content_type not in allowed:
+            raise HTTPException(status_code=400, detail="Image must be PNG, JPEG, or WEBP")
+        ext = image.filename.rsplit(".", 1)[-1] if "." in image.filename else "png"
+        temp_id = str(_uuid.uuid4())
+        image_path = os.path.join(UPLOAD_DIR, f"{temp_id}.{ext}")
+        with open(image_path, "wb") as f:
+            shutil.copyfileobj(image.file, f)
 
     job = create_job(image_path=image_path, prompt=prompt)
     return {"job_id": job.id, "status": job.status}

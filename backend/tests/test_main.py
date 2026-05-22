@@ -40,9 +40,10 @@ def test_generate_rejects_missing_prompt():
     assert resp.status_code == 422
 
 
-def test_generate_rejects_missing_image():
+def test_generate_accepts_prompt_only():
     resp = client.post("/generate", data={"prompt": "squat"})
-    assert resp.status_code == 422
+    assert resp.status_code == 200
+    assert "job_id" in resp.json()
 
 
 def test_status_returns_queued_for_new_job():

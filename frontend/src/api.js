@@ -1,6 +1,6 @@
 export async function submitGenerate(imageFile, prompt) {
   const form = new FormData()
-  form.append('image', imageFile)
+  if (imageFile) form.append('image', imageFile)
   form.append('prompt', prompt)
   const res = await fetch('/generate', { method: 'POST', body: form })
   if (!res.ok) {

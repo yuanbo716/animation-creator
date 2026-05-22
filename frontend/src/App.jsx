@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
 import './App.css'
-import ImageUpload from './components/ImageUpload'
 import PromptInput from './components/PromptInput'
 import GenerateButton from './components/GenerateButton'
 import ProgressPanel from './components/ProgressPanel'
@@ -19,7 +18,7 @@ export default function App() {
   const pollRef = useRef(null)
 
   const isLoading = jobStatus === 'queued' || jobStatus === 'running'
-  const canGenerate = file !== null && prompt.trim().length > 0 && !isLoading
+  const canGenerate = prompt.trim().length > 0 && !isLoading
 
   useEffect(() => {
     if (!jobId || jobStatus === 'done' || jobStatus === 'failed') {
@@ -58,11 +57,10 @@ export default function App() {
     <div className="app">
       <header className="app-header">
         <h1>Animation Creator</h1>
-        <p className="app-subtitle">Upload an avatar · describe the motion · get a looping GIF</p>
+        <p className="app-subtitle">Describe a motion · get a looping GIF</p>
       </header>
       <main className="app-main">
         <section className="controls-panel">
-          <ImageUpload file={file} onFileSelect={setFile} />
           <PromptInput value={prompt} onChange={setPrompt} />
           <GenerateButton onClick={handleGenerate} disabled={!canGenerate} loading={isLoading} />
         </section>
