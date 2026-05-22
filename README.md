@@ -78,16 +78,23 @@ The model (~6 GB) downloads automatically on first generation and is cached at `
 
 ## Configuration
 
-### More frames (24 GB+ RAM only)
+### Higher resolution / more frames (24 GB+ RAM only)
 
 Edit `backend/inference.py` and change:
 
 ```python
-_NUM_FRAMES = 9   # ~1 s — safe for 16 GB
-# _NUM_FRAMES = 17  # ~2 s — requires 24 GB+
+# 16 GB — default, safe
+_NUM_FRAMES = 9
+_HEIGHT = 320
+_WIDTH = 512
+
+# 24 GB — higher quality
+_NUM_FRAMES = 17
+_HEIGHT = 480
+_WIDTH = 832
 ```
 
-Valid values: 9, 17, 25, 33 … (must satisfy `k×8 + 1`)
+Valid frame values: 9, 17, 25, 33 … (must satisfy `k×8 + 1`)
 
 ### Port conflicts
 

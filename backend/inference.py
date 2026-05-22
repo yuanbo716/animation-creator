@@ -14,11 +14,11 @@ _pipeline = None
 _MODEL_ID = "Wan-AI/Wan2.1-T2V-1.3B-Diffusers"
 
 # 9 frames = ~1 s @ 8 fps; must satisfy k*8+1 for Wan temporal compression.
-# 480×832 at 17 frames exceeds 16 GB unified memory — 9 frames at 480×832
-# or 17 frames at 320×512 are safe upper bounds.
+# 480×832 still OOMs on 16 GB even at 9 frames — 320×512 cuts spatial tokens
+# by ~60% and keeps peak MPS usage well under the 18 GB watermark.
 _NUM_FRAMES = 9
-_HEIGHT = 480
-_WIDTH = 832
+_HEIGHT = 320
+_WIDTH = 512
 _FPS = 8
 
 
@@ -32,8 +32,9 @@ def _get_pipeline():
         torch_dtype=torch.bfloat16,
     )
     _pipeline.to("mps")
-    # Slice attention computation to reduce peak MPS memory usage.
+    # Slice attention and VAE decode to reduce peak MPS memory usage.
     _pipeline.enable_attention_slicing()
+    _pipeline.enable_vae_slicing()
     return _pipeline
 
 
