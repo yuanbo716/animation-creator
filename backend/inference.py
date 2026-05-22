@@ -32,9 +32,8 @@ def _get_pipeline():
         torch_dtype=torch.bfloat16,
     )
     _pipeline.to("mps")
-    # Slice attention and VAE decode to reduce peak MPS memory usage.
+    # Slice attention computation to reduce peak MPS memory usage.
     _pipeline.enable_attention_slicing()
-    _pipeline.enable_vae_slicing()
     return _pipeline
 
 
