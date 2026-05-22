@@ -13,8 +13,12 @@ _pipeline = None
 # The 1.3B I2V variant does not exist; the I2V line starts at 14B.
 _MODEL_ID = "Wan-AI/Wan2.1-T2V-1.3B-Diffusers"
 
-# 17 frames = 2 s @ 8 fps; must satisfy k*8+1 for Wan temporal compression.
-_NUM_FRAMES = 17
+# 9 frames = ~1 s @ 8 fps; must satisfy k*8+1 for Wan temporal compression.
+# 480×832 at 17 frames exceeds 16 GB unified memory — 9 frames at 480×832
+# or 17 frames at 320×512 are safe upper bounds.
+_NUM_FRAMES = 9
+_HEIGHT = 480
+_WIDTH = 832
 _FPS = 8
 
 
@@ -28,6 +32,8 @@ def _get_pipeline():
         torch_dtype=torch.bfloat16,
     )
     _pipeline.to("mps")
+    # Slice attention computation to reduce peak MPS memory usage.
+    _pipeline.enable_attention_slicing()
     return _pipeline
 
 
@@ -40,6 +46,7 @@ def generate_animation(
 ) -> Tuple[str, str]:
     os.makedirs(output_dir, exist_ok=True)
 
+    torch.mps.empty_cache()
     pipe = _get_pipeline()
 
     def _step_cb(pipe, step: int, timestep, callback_kwargs):
@@ -49,8 +56,8 @@ def generate_animation(
 
     output = pipe(
         prompt=prompt,
-        height=480,
-        width=832,
+        height=_HEIGHT,
+        width=_WIDTH,
         num_frames=_NUM_FRAMES,
         num_inference_steps=num_inference_steps,
         callback_on_step_end=_step_cb,
