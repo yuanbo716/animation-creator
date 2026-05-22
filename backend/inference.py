@@ -64,7 +64,14 @@ def generate_animation(
     )
 
     raw = output.frames[0]
-    frames = [Image.fromarray(f) if isinstance(f, np.ndarray) else f for f in raw]
+    def _to_pil(f):
+        if isinstance(f, Image.Image):
+            return f
+        arr = np.array(f)
+        if arr.dtype != np.uint8:
+            arr = (arr * 255).clip(0, 255).astype(np.uint8)
+        return Image.fromarray(arr)
+    frames = [_to_pil(f) for f in raw]
     job_id = str(uuid.uuid4())
 
     duration_ms = int(1000 / _FPS)
